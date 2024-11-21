@@ -13,7 +13,7 @@ export default function GalleryGrid({ images }: { images: SearchResult[] }) {
       {images.map((image) => (
         <CloudinaryImage
           key={image.public_id}
-          imageData={image}
+          imagedata={image}
           width="400"
           height="300"
           alt={`Image tagged with ${image.tags.join(", ")}`}

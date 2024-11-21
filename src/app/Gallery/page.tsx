@@ -10,12 +10,15 @@ export type SearchResult = {
 };
 
 export default async function GalleryPage({
-  searchParams,
+  searchParams: initialSearchParams,
 }: {
-  searchParams: {
-    search?: string;
-  };
+  searchParams: { search?: string };
 }) {
+  // Await dynamic async access to searchParams
+  const searchParams = await Promise.resolve(initialSearchParams);
+  const searchQuery = searchParams?.search || ""; // Safely access searchQuery
+
+  // Configure Cloudinary
   cloudinary.v2.config({
     cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -23,8 +26,11 @@ export default async function GalleryPage({
   });
 
   try {
+    // Fetch results from Cloudinary
     const results = (await cloudinary.v2.search
-      .expression(`resource_type:image${searchParams?.search ? ` AND tags=${searchParams.search}` : ""}`)
+      .expression(
+        `resource_type:image${searchQuery ? ` AND tags=${searchQuery}` : ""}`
+      )
       .sort_by("created_at", "desc")
       .with_field("tags")
       .max_results(30)
@@ -33,14 +39,13 @@ export default async function GalleryPage({
     return (
       <section>
         <div className="flex flex-col gap-8">
-         
-          <div className="flex justify-between justify">
+          <div className="flex justify-between">
             <h1 className="text-4xl font-bold text-gray-800">Gallery</h1>
             <UploadButton />
           </div>
 
           {/* Search Form */}
-          <SearchForm initialSearch={searchParams?.search || ""} />
+          <SearchForm initialSearch={searchQuery} />
           <GalleryGrid images={results.resources} />
         </div>
       </section>
