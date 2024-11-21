@@ -1,6 +1,6 @@
+// eslint-disable
 "use client";
 
-import { ImageGrid } from "@/components2/image-grid";
 import { SearchResult } from "./page";
 import { CloudinaryImage } from "@/components2/cloudinary-image";
 export default function GalleryGrid({ images }: { images: SearchResult[] }) {

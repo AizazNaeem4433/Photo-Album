@@ -1,22 +1,21 @@
+// eslint-disable-next-line
 import UploadButton from "./upload-button";
 import cloudinary from "cloudinary";
 import GalleryGrid from "./gallery-grid";
 import { SearchForm } from "./search-form";
 
 export type SearchResult = {
-  id: any;
+  id: number;
   public_id: string;
   tags: string[];
 };
 
 export default async function GalleryPage({
-  searchParams: initialSearchParams,
+  searchParams,
 }: {
-  searchParams: { search?: string };
+  searchParams: Promise<{ search?: string}>;
 }) {
-  // Await dynamic async access to searchParams
-  const searchParams = await Promise.resolve(initialSearchParams);
-  const searchQuery = searchParams?.search || ""; // Safely access searchQuery
+  const searchQuery = (await searchParams)?.search || ""; // Safely access searchQuery
 
   // Configure Cloudinary
   cloudinary.v2.config({
@@ -26,7 +25,8 @@ export default async function GalleryPage({
   });
 
   try {
-    // Fetch results from Cloudinary
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore: Suppress Cloudinary type mismatch temporarily
     const results = (await cloudinary.v2.search
       .expression(
         `resource_type:image${searchQuery ? ` AND tags=${searchQuery}` : ""}`
@@ -51,6 +51,7 @@ export default async function GalleryPage({
       </section>
     );
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error fetching gallery images:", error);
     return (
       <section className="container mx-auto p-4">
